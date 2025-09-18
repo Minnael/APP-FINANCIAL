@@ -22,40 +22,37 @@ function LoginScreen({ navigation }) {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#000' }}>
-      <Text style={{ color: '#fff' }}>Login:</Text>
-      <TextInput value={loginInput} onChangeText={setLoginInput} placeholder="login" placeholderTextColor="#888" style={{ borderWidth: 1, borderColor: '#fff', backgroundColor: '#fff', color: '#000', width: 200, marginBottom: 8, padding: 8, borderRadius: 4 }} />
-      <Text style={{ color: '#fff' }}>Senha:</Text>
-      <TextInput value={passwordInput} onChangeText={setPasswordInput} placeholder="senha" placeholderTextColor="#888" secureTextEntry style={{ borderWidth: 1, borderColor: '#fff', backgroundColor: '#fff', color: '#000', width: 200, marginBottom: 8, padding: 8, borderRadius: 4 }} />
-      <View style={{ width: 200, marginBottom: 8 }}>
-        <Button title="Registrar" color="#007bff" onPress={async () => {
-          const res = await register(loginInput, passwordInput);
-          setResult(JSON.stringify(res));
-          if (!res.error) {
-            Alert.alert('Registrado com sucesso!');
-          }
-        }} />
+    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#181A20' }}>
+      <View style={{ width: '100%', maxWidth: 340, backgroundColor: '#23262F', borderRadius: 16, padding: 24, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 8, elevation: 4 }}>
+        <Text style={{ color: '#fff', fontSize: 28, fontWeight: 'bold', marginBottom: 24, letterSpacing: 1 }}>Login</Text>
+        <TextInput value={loginInput} onChangeText={setLoginInput} placeholder="Usuário" placeholderTextColor="#888" style={{ borderWidth: 0, backgroundColor: '#fff', color: '#000', width: '100%', marginBottom: 16, padding: 14, borderRadius: 8, fontSize: 16 }} />
+        <TextInput value={passwordInput} onChangeText={setPasswordInput} placeholder="Senha" placeholderTextColor="#888" secureTextEntry style={{ borderWidth: 0, backgroundColor: '#fff', color: '#000', width: '100%', marginBottom: 16, padding: 14, borderRadius: 8, fontSize: 16 }} />
+        <View style={{ width: '100%', marginBottom: 12 }}>
+          <Button title="Entrar" color="#2563eb" onPress={async () => {
+            const res = await login(loginInput, passwordInput);
+            setResult(JSON.stringify(res));
+            if (!res.error) {
+              navigation.replace('Produtos');
+            } else {
+              Alert.alert('Erro', res.message || 'Login inválido!');
+            }
+          }} />
+        </View>
+        <View style={{ width: '100%', marginBottom: 12 }}>
+          <Button title="Registrar" color="#22d3ee" onPress={async () => {
+            const res = await register(loginInput, passwordInput);
+            setResult(JSON.stringify(res));
+            if (!res.error) {
+              Alert.alert('Registrado com sucesso!');
+            }
+          }} />
+        </View>
+        {/* Removido botão Check Token e label Resultado */}
+        {/* Exibe mensagem de erro de login, se houver */}
+        {result && JSON.parse(result).error && (
+          <Text style={{ color: '#ff5252', marginTop: 8, fontSize: 14 }}>{JSON.parse(result).message || 'Login inválido!'}</Text>
+        )}
       </View>
-      <View style={{ width: 200, marginBottom: 8 }}>
-        <Button title="Login" color="#007bff" onPress={async () => {
-          const res = await login(loginInput, passwordInput);
-          setResult(JSON.stringify(res));
-          if (!res.error) {
-            navigation.replace('Produtos');
-          }
-        }} />
-      </View>
-      <View style={{ width: 200, marginBottom: 8 }}>
-        <Button title="Check Token" color="#007bff" onPress={async () => {
-          const res = await check();
-          setResult(JSON.stringify(res));
-          if (res && !res.error) {
-            navigation.replace('Produtos');
-          }
-        }} />
-      </View>
-      <Text style={{ marginTop: 16, color: '#fff' }}>Resultado:</Text>
-      <Text selectable style={{ fontSize: 12, marginBottom: 16, color: '#fff' }}>{result}</Text>
     </ScrollView>
   );
 }
@@ -77,40 +74,65 @@ function ProdutosScreen({ navigation }) {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#000' }}>
-      <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Cadastro de Produto</Text>
-      <TextInput value={productName} onChangeText={setProductName} placeholder="Nome do produto" placeholderTextColor="#888" style={{ borderWidth: 1, borderColor: '#fff', backgroundColor: '#fff', color: '#000', width: 200, marginBottom: 8, padding: 8, borderRadius: 4 }} />
-      <TextInput value={productDescricao} onChangeText={setProductDescricao} placeholder="Descrição" placeholderTextColor="#888" style={{ borderWidth: 1, borderColor: '#fff', backgroundColor: '#fff', color: '#000', width: 200, marginBottom: 8, padding: 8, borderRadius: 4 }} />
-      <TextInput value={productPreco} onChangeText={setProductPreco} placeholder="Preço" placeholderTextColor="#888" keyboardType="numeric" style={{ borderWidth: 1, borderColor: '#fff', backgroundColor: '#fff', color: '#000', width: 200, marginBottom: 8, padding: 8, borderRadius: 4 }} />
-      <TextInput value={productCategoria} onChangeText={setProductCategoria} placeholder="Categoria" placeholderTextColor="#888" style={{ borderWidth: 1, borderColor: '#fff', backgroundColor: '#fff', color: '#000', width: 200, marginBottom: 8, padding: 8, borderRadius: 4 }} />
-      <View style={{ width: 200, marginBottom: 8 }}>
-        <Button title="Criar Produto" color="#007bff" onPress={async () => {
-          const precoNumber = parseFloat(productPreco);
-          const res = await createProduct({
-            nome: productName,
-            descricao: productDescricao,
-            preco: isNaN(precoNumber) ? 0 : precoNumber,
-            categoria: productCategoria
-          });
-          setResult(JSON.stringify(res));
-          // Atualiza lista após criar
-          const lista = await listProducts();
-          if (lista && lista.produtos) setProducts(lista.produtos);
-        }} />
+    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#181A20' }}>
+      <View style={{ width: '100%', maxWidth: 400, backgroundColor: '#23262F', borderRadius: 16, padding: 24, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 8, elevation: 4 }}>
+        <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#fff', marginBottom: 20, letterSpacing: 1 }}>Cadastro de Produto</Text>
+        <TextInput value={productName} onChangeText={setProductName} placeholder="Nome do produto" placeholderTextColor="#888" style={{ borderWidth: 0, backgroundColor: '#fff', color: '#000', width: '100%', marginBottom: 12, padding: 14, borderRadius: 8, fontSize: 16 }} />
+        <TextInput value={productDescricao} onChangeText={setProductDescricao} placeholder="Descrição" placeholderTextColor="#888" style={{ borderWidth: 0, backgroundColor: '#fff', color: '#000', width: '100%', marginBottom: 12, padding: 14, borderRadius: 8, fontSize: 16 }} />
+        <TextInput value={productPreco} onChangeText={setProductPreco} placeholder="Preço" placeholderTextColor="#888" keyboardType="numeric" style={{ borderWidth: 0, backgroundColor: '#fff', color: '#000', width: '100%', marginBottom: 12, padding: 14, borderRadius: 8, fontSize: 16 }} />
+        <TextInput value={productCategoria} onChangeText={setProductCategoria} placeholder="Categoria" placeholderTextColor="#888" style={{ borderWidth: 0, backgroundColor: '#fff', color: '#000', width: '100%', marginBottom: 16, padding: 14, borderRadius: 8, fontSize: 16 }} />
+        <View style={{ width: '100%', marginBottom: 12 }}>
+          <Button title="Criar Produto" color="#2563eb" onPress={async () => {
+            const precoNumber = parseFloat(productPreco);
+            const res = await createProduct({
+              nome: productName,
+              descricao: productDescricao,
+              preco: isNaN(precoNumber) ? 0 : precoNumber,
+              categoria: productCategoria
+            });
+            if (!res.error) {
+              Alert.alert('Cadastrado com Sucesso!');
+            }
+            // Atualiza lista após criar
+            const lista = await listProducts();
+            if (lista && lista.produtos) setProducts(lista.produtos);
+          }} />
+        </View>
+        <View style={{ width: '100%', marginBottom: 12 }}>
+          <Button title="Listar Produtos" color="#6366f1" onPress={() => {
+            navigation.navigate('ListagemProdutos');
+          }} />
+        </View>
       </View>
-      <View style={{ width: 200, marginBottom: 8 }}>
-        <Button title="Listar Produtos" color="#007bff" onPress={async () => {
-          const res = await listProducts();
-          setProducts(res.produtos || []);
-          setResult(JSON.stringify(res));
-        }} />
+    </ScrollView>
+  );
+}
+
+function ListagemProdutosScreen() {
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const res = await listProducts();
+      if (res && res.produtos) setProducts(res.produtos);
+    })();
+  }, []);
+  return (
+    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#181A20' }}>
+      <View style={{ width: '100%', maxWidth: 400, backgroundColor: '#23262F', borderRadius: 16, padding: 24, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 8, elevation: 4 }}>
+        <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#fff', marginBottom: 20, letterSpacing: 1 }}>Produtos Cadastrados</Text>
+        <View style={{ width: '100%', marginTop: 8 }}>
+          {Array.isArray(products) && products.length === 0 && (
+            <Text style={{ color: '#fff', opacity: 0.7 }}>Nenhum produto cadastrado.</Text>
+          )}
+          {Array.isArray(products) && products.map((p, i) => (
+            <View key={i} style={{ backgroundColor: '#181A20', borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#23262F' }}>
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>{p.nome}</Text>
+              <Text style={{ color: '#fff', opacity: 0.8 }}>R$ {p.preco} - {p.categoria}</Text>
+              <Text style={{ color: '#fff', opacity: 0.7, fontSize: 12 }}>{p.descricao}</Text>
+            </View>
+          ))}
+        </View>
       </View>
-      <Text style={{ marginTop: 16, fontWeight: 'bold', color: '#fff' }}>Produtos:</Text>
-      {Array.isArray(products) && products.map((p, i) => (
-        <Text key={i} style={{ color: '#fff' }}>{p.nome} - R$ {p.preco} - {p.categoria}</Text>
-      ))}
-      <Text style={{ marginTop: 16, color: '#fff' }}>Resultado:</Text>
-      <Text selectable style={{ fontSize: 12, marginBottom: 16, color: '#fff' }}>{result}</Text>
     </ScrollView>
   );
 }
@@ -121,6 +143,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Produtos" component={ProdutosScreen} />
+        <Stack.Screen name="ListagemProdutos" component={ListagemProdutosScreen} options={{ title: 'Produtos' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
