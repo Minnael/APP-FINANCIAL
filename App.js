@@ -1,13 +1,18 @@
 
+
 import React, { useState } from 'react';
 import { Text, View, Button, TextInput, ScrollView } from 'react-native';
 import { register, login, check, createProduct, listProducts } from './api';
+
 
 export default function App() {
   const [loginInput, setLoginInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [result, setResult] = useState('');
   const [productName, setProductName] = useState('');
+  const [productDescricao, setProductDescricao] = useState('');
+  const [productPreco, setProductPreco] = useState('');
+  const [productCategoria, setProductCategoria] = useState('');
   const [products, setProducts] = useState([]);
 
   return (
@@ -28,10 +33,20 @@ export default function App() {
         const res = await check();
         setResult(JSON.stringify(res));
       }} />
+
       <Text style={{ marginTop: 16 }}>Produto:</Text>
       <TextInput value={productName} onChangeText={setProductName} placeholder="Nome do produto" style={{ borderWidth: 1, width: 200, marginBottom: 8 }} />
+      <TextInput value={productDescricao} onChangeText={setProductDescricao} placeholder="Descrição" style={{ borderWidth: 1, width: 200, marginBottom: 8 }} />
+      <TextInput value={productPreco} onChangeText={setProductPreco} placeholder="Preço" keyboardType="numeric" style={{ borderWidth: 1, width: 200, marginBottom: 8 }} />
+      <TextInput value={productCategoria} onChangeText={setProductCategoria} placeholder="Categoria" style={{ borderWidth: 1, width: 200, marginBottom: 8 }} />
       <Button title="Criar Produto" onPress={async () => {
-        const res = await createProduct({ nome: productName, descricao: '', preco: 0, categoria: '' });
+        const precoNumber = parseFloat(productPreco);
+        const res = await createProduct({
+          nome: productName,
+          descricao: productDescricao,
+          preco: isNaN(precoNumber) ? 0 : precoNumber,
+          categoria: productCategoria
+        });
         setResult(JSON.stringify(res));
       }} />
       <Button title="Listar Produtos" onPress={async () => {
